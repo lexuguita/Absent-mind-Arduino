@@ -6,5 +6,5 @@
 #ESP32 CON SENSOR DE PRESENCIA PIR Y CONTROL DE RELE
 ![esp_pir_rele](https://github.com/user-attachments/assets/8063ccef-ab19-4fa3-9c67-aafe10d313f1)
 
-#ESP32 CON DFPLAYERMINI Y ALTAVOZ
+#ESP32 CON DFPLAYERMINI, ALTAVOZ Y BOTON
 ![esp_altavoz_pusl](https://github.com/user-attachments/assets/eecc8e17-ab5d-4cdd-8017-f6c90863a45f)
