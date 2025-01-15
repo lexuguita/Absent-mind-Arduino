@@ -10,7 +10,7 @@ TMP117 sensor;
 const int PIN = 2;        // Pin de salida
 const int CUTOFF = -40;   // Umbral de RSSI
 const String TARGET_MAC = "AA:BB:DA:97:34:EE"; // MAC objetivo
-const int relayPin = 3;   // Pin del relé
+const int relayPin = 26;   // Pin del relé
 
 // Direcciones MAC de los receptores
 uint8_t receiverMAC1[] = {0x24, 0x0A, 0xC4, 0xA6, 0xD9, 0x14}; // MAC del primer receptor
@@ -74,7 +74,7 @@ void setup() {
 }
 
 // Escanea redes y detecta el dispositivo objetivo
-int readRSSi(int netWorkCount, int bestRSSI) {
+int readRSSi(int netWorkCount, int &bestRSSI) {
   for (int i = 0; i < netWorkCount; i++) {
     String ssid = WiFi.SSID(i);            // Obtiene el SSID de la red
     int rssi = WiFi.RSSI(i);               // Obtiene el RSSI de la red
@@ -124,7 +124,8 @@ void loop() {
 
   if (E == 0) {
     // Si se cumple la condición, envía los datos a ambos receptores
-    dataToSend.RSSIStatus = E;
+    dataToSend.RSSIStatus = bestRSSI; // Enviar el valor de RSSI
+      Serial.println(bestRSSI);
     // Enviar datos al primer receptor
     esp_err_t result1 = esp_now_send(receiverMAC1, (uint8_t *)&dataToSend, sizeof(dataToSend));
     if (result1 == ESP_OK) {
