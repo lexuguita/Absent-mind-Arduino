@@ -65,7 +65,7 @@ void onDataReceive(const esp_now_recv_info_t *info, const uint8_t *incomingData,
   Serial.print("RSSIStatus: ");
   Serial.println(receivedData.RSSIStatus);
 
-  if (receivedData.RSSIStatus == 0 && isAfter2230()) {
+  if (receivedData.RSSIStatus <-30 && isAfter2230()) {
     startPIRControl = true;
     Serial.println("Iniciando control basado en PIR (después de la hora objetivo).");
   } else {
@@ -115,6 +115,6 @@ void loop() {
     }
   } else {
     Serial.println("Control PIR inactivo. Esperando condiciones.");
-    delay(1000);
+    delay(3000);
   }
 }
