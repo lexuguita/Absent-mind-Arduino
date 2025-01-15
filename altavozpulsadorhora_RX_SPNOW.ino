@@ -38,20 +38,21 @@ struct_message receivedData; // Datos recibidos
 
 // Callback para recibir datos ESP-NOW
 void onDataRecv(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len) {
-  int RSSIStatus;
-  memcpy(&RSSIStatus, data, sizeof(RSSIStatus)); // Copia el dato recibido (entero)
+  // Copia el dato recibido a la estructura
+  memcpy(&receivedData, data, sizeof(receivedData));
+
   Serial.printf("Datos recibidos de MAC: %02X:%02X:%02X:%02X:%02X:%02X\n",
                 recv_info->src_addr[0], recv_info->src_addr[1], recv_info->src_addr[2],
                 recv_info->src_addr[3], recv_info->src_addr[4], recv_info->src_addr[5]);
-  Serial.printf("RSSIStatus recibido: %d\n", RSSIStatus);
+  Serial.printf("RSSIStatus recibido: %d\n", receivedData.RSSIStatus);
 
   // Verifica si la condición del emisor se cumple
- if(receivedData.RSSIStatus == 0)
- {
-   condicionRecibida = true;
-   
- }
+  if (receivedData.RSSIStatus < -30) {
+    condicionRecibida = true; // Activa la condición
+    Serial.println("Condición recibida: Loop habilitado");
+  }
 }
+
 
 void setup() {
   Serial.begin(115200);
@@ -101,8 +102,10 @@ void setup() {
 void loop() {
   // Espera a que se reciba la condición del emisor
   Serial.println(condicionRecibida);
-  if (condicionRecibida==true) {
-    Serial.println("señal recibida");
+  if(!condicionRecibida){
+    Serial.println("Esperando");
+    delay(1000);
+    return;
   }
   timeClient.update(); // Actualiza la hora desde NTP
 
