@@ -23,6 +23,10 @@ typedef struct {
 
 struct_message dataToSend;
 
+// Variables de temporización
+unsigned long relayOffStartTime = 0; // Momento en que empieza a cumplir la condición para apagar el relé
+bool relayOffConditionMet = false;  // Indica si se cumplen las condiciones para apagar el relé
+
 void setup() {
   Serial.begin(115200);
 
@@ -117,15 +121,25 @@ void loop() {
   if (E == 1 && tempC < 27.0) {
     digitalWrite(relayPin, LOW);
     Serial.println("Relé ON");
+    relayOffStartTime = 0; // Reinicia el temporizador si la condición de apagado no se cumple
+    relayOffConditionMet = false;
   } else if (E == 0 && tempC > 19.0) {
-    digitalWrite(relayPin, HIGH);
-    Serial.println("Relé OFF");
+    if (!relayOffConditionMet) {
+      relayOffStartTime = millis(); // Registra el tiempo actual
+      relayOffConditionMet = true;
+    } else if (millis() - relayOffStartTime >= 180000) { // Verifica si han pasado 3 minutos
+      digitalWrite(relayPin, HIGH);
+      Serial.println("Relé OFF");
+    }
+  } else {
+    relayOffStartTime = 0; // Reinicia el temporizador si las condiciones no se cumplen
+    relayOffConditionMet = false;
   }
 
   if (E == 0) {
     // Si se cumple la condición, envía los datos a ambos receptores
     dataToSend.RSSIStatus = bestRSSI; // Enviar el valor de RSSI
-      Serial.println(bestRSSI);
+    Serial.println(bestRSSI);
     // Enviar datos al primer receptor
     esp_err_t result1 = esp_now_send(receiverMAC1, (uint8_t *)&dataToSend, sizeof(dataToSend));
     if (result1 == ESP_OK) {
